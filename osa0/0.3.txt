@@ -1,3 +1,5 @@
+@startuml
+
 käyttäjä->selain:
 note left of selain
 käyttäjä siirtyy selaimella sivulle 
@@ -27,3 +29,5 @@ Selaimen suorittama main.js lukee saadun datan ja lisää sen
 HTML-dokumentin listaan. Selain näyttää lopputuloksen käyttäjälle.
 end note
 selain->käyttäjä: 
+
+@enduml
