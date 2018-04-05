@@ -1,0 +1,30 @@
+@startuml
+
+käyttäjä->selain:
+note left of selain
+käyttäjä siirtyy selaimella sivulle
+https://fullstack-exampleapp.herokuapp.com/notes
+end note
+selain-->palvelin: GET https://fullstack-exampleapp.herokuapp.com/notes
+palvelin-->selain: status 200, sivun HTML-dokumentti
+note left of selain
+selain tulkitsee dokumenttia ja tarvitsee
+main.js sekä main.css tiedostot
+end note
+selain-->palvelin: GET https://fullstack-exampleapp.herokuapp.com/main.css
+palvelin-->selain: status 200, main.css
+
+selain-->palvelin: GET https://fullstack-exampleapp.herokuapp.com/main.js
+palvelin-->selain: status 200, main.js
+note left of selain
+selain suorittaa main.js koodin
+end note
+selain-->palvelin: GET https://fullstack-exampleapp.herokuapp.com/data.json
+palvelin-->selain: status 200, data.json
+note left of selain
+Selaimen suorittama main.js lukee saadun datan ja lisää sen
+HTML-dokumentin listaan. Selain näyttää lopputuloksen käyttäjälle.
+end note
+selain->käyttäjä:
+
+@enduml

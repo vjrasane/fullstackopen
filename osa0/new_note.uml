@@ -2,22 +2,26 @@
 
 käyttäjä->selain:
 note left of selain
-käyttäjä siirtyy selaimella sivulle 
-https://fullstack-exampleapp.herokuapp.com/notes
+käyttäjä kirjoittaa muistiinpanon ja klikkaa 'talleta'
 end note
+selain-->palvelin: POST https://fullstack-exampleapp.herokuapp.com/new_note
+palvelin-->selain: status 302 Found
+
+note left of selain
+selain hakee notes sivun uudestaan,
+kuten aikaisemmassa sekvenssikaaviossa
+end note
+
 selain-->palvelin: GET https://fullstack-exampleapp.herokuapp.com/notes
 palvelin-->selain: status 200, sivun HTML-dokumentti
 note left of selain
-selain tulkitsee dokumenttia ja tarvitsee 
+selain tulkitsee dokumenttia ja tarvitsee
 main.js sekä main.css tiedostot
 end note
-selain-->palvelin: GET https://fullstack-exampleapp.herokuapp.com/main.js
 selain-->palvelin: GET https://fullstack-exampleapp.herokuapp.com/main.css
-note right of palvelin
-tarvittavat tiedostot 
-pyydetään samanaikaisesti
-end note
 palvelin-->selain: status 200, main.css
+
+selain-->palvelin: GET https://fullstack-exampleapp.herokuapp.com/main.js
 palvelin-->selain: status 200, main.js
 note left of selain
 selain suorittaa main.js koodin
@@ -28,6 +32,6 @@ note left of selain
 Selaimen suorittama main.js lukee saadun datan ja lisää sen
 HTML-dokumentin listaan. Selain näyttää lopputuloksen käyttäjälle.
 end note
-selain->käyttäjä: 
+selain->käyttäjä:
 
 @enduml

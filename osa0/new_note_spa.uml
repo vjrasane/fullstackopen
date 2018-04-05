@@ -1,0 +1,12 @@
+@startuml
+
+käyttäjä->selain:
+note left of selain
+käyttäjä kirjoittaa muistiinpanon ja klikkaa 'talleta'.
+spa.js lisää muistiinpanon 'notes' listaan ja lähettää
+sen palvelimelle
+end note
+selain-->palvelin: POST https://fullstack-exampleapp.herokuapp.com/new_note_spa
+palvelin-->selain: status 201 Created,
+
+@enduml
