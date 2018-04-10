@@ -1,5 +1,4 @@
-
-const jwt = require('jsonwebtoken')
+const security = require('../utils/security')
 
 const getTokenFrom = (request) => {
   const authorization = request.get('authorization')
@@ -12,7 +11,7 @@ const getTokenFrom = (request) => {
 const token = (req, res, next) => {
   try {
     const token = getTokenFrom(req)
-    req.token = token ? jwt.verify(token, process.env.SECRET) : null
+    req.token = token ? security.verify(token) : null
     next()
   } catch(ex) {
     res.status(400).send({ error: 'invalid token' })

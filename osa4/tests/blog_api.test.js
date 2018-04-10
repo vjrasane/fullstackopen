@@ -2,25 +2,28 @@ const utils = require('./blog_helper')
 const Blog = require('../models/blog')
 const User = require('../models/user')
 const data = require('./data')
+const security = require('../utils/security')
 
 const { app, server } = require('../index')
 const supertest = require('supertest')
 const api = supertest(app)
 
 describe('when some blogs already exist', async () => {
+  let authHeaders
   let blogUser
   beforeAll(async () => {
     await Blog.remove({})
+    await User.remove({})
 
-    blogUser = new User({
-      // _id: 'testid',
+    blogUser = await security.initUser({
       username: 'Teppo Testaaja',
       password: 'passu',
       major: 1
     })
-
     blogUser = await blogUser.save()
-    // blogUser = await User.findOne({ username: blogUser.username })
+
+    const token = security.sign({ username: blogUser.username, id: blogUser._id })
+    authHeaders = { 'Authorization' : `Bearer ${token}` }
 
     const blogObjs = data.manyBlogs.map(b => new Blog(b))
     const promises /*! and they still feel oh so wasted on myself  */
@@ -49,7 +52,6 @@ describe('when some blogs already exist', async () => {
       const initialBlogs = await utils.retrieveBlogs()
 
       const newBlog = {
-        userId: blogUser._id,
         title: 'New added blog',
         author: 'Teppo Testaaja',
         url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
@@ -58,6 +60,7 @@ describe('when some blogs already exist', async () => {
 
       await api
         .post('/api/blogs')
+        .set(authHeaders)
         .send(newBlog)
         .expect(201)
 
@@ -70,7 +73,6 @@ describe('when some blogs already exist', async () => {
 
     test('have zero inital likes', async () => {
       const newBlog = {
-        userId: blogUser._id,
         title: 'New unique blog name',
         author: 'Teppo Testaaja',
         url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
@@ -79,59 +81,25 @@ describe('when some blogs already exist', async () => {
 
       const added = await api
         .post('/api/blogs')
+        .set(authHeaders)
         .send(newBlog)
         .expect(201)
 
       expect(added.body.likes).toBe(0)
     })
 
-    const expectNotAdded = async (blog) => {
+    test('missing fields', async () => {
       const initialBlogs = await utils.retrieveBlogs()
 
       await api
         .post('/api/blogs')
-        .send(blog)
+        .set(authHeaders)
+        .send({})
         .expect(400)
 
       const afterBlogs = await utils.retrieveBlogs()
 
       expect(afterBlogs.length).toBe(initialBlogs.length)
-    }
-
-    test('without title is not added', async () => {
-      const newBlog = {
-        userId: blogUser._id,
-        // title: 'New added blog',
-        author: 'Teppo Testaaja',
-        url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-        likes: 0
-      }
-
-      await expectNotAdded(newBlog)
-    })
-
-    test('without url is not added', async () => {
-      const newBlog = {
-        userId: blogUser._id,
-        title: 'New added blog',
-        author: 'Teppo Testaaja',
-        // url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-        likes: 0
-      }
-
-      await expectNotAdded(newBlog)
-    })
-
-    test('without author is not added', async () => {
-      const newBlog = {
-        userId: blogUser._id,
-        title: 'New added blog',
-        // author: 'Teppo Testaaja',
-        url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-        likes: 0
-      }
-
-      await expectNotAdded(newBlog)
     })
   })
 
@@ -142,19 +110,21 @@ describe('when some blogs already exist', async () => {
     beforeAll(async () => {
       initialBlogs = await utils.retrieveBlogs()
       addedBlog = new Blog({
-        userId: blogUser._id,
         title: 'Delete this',
         author: 'Teppo Testaaja',
         url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-        likes: 0
+        likes: 0,
+        user: blogUser._id
       })
       addedBlog = await addedBlog.save()
     })
 
     test('successfully removed', async () => {
       const beforeBlogs = await utils.retrieveBlogs()
-
-      await api.delete(`/api/blogs/${addedBlog._id}`)
+      console.log(authHeaders)
+      await api
+        .delete(`/api/blogs/${addedBlog._id}`)
+        .set(authHeaders)
         .expect(204)
 
       const afterBlogs = await utils.retrieveBlogs()
@@ -170,7 +140,9 @@ describe('when some blogs already exist', async () => {
     test('inexistent id', async () => {
       const beforeBlogs = await utils.retrieveBlogs()
 
-      await api.delete('/api/blogs/inexistent')
+      await api
+        .delete('/api/blogs/inexistent')
+        .set(authHeaders)
         .expect(500)
 
       const afterBlogs = await utils.retrieveBlogs()
@@ -190,11 +162,11 @@ describe('when some blogs already exist', async () => {
     beforeAll(async () => {
       initialBlogs = await utils.retrieveBlogs()
       addedBlog = new Blog({
-        userId: blogUser._id,
         title: 'Modify this',
         author: 'Teppo Testaaja',
         url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-        likes: 0
+        likes: 0,
+        user: blogUser._id
       })
       await addedBlog.save()
     })
@@ -203,14 +175,15 @@ describe('when some blogs already exist', async () => {
       const beforeBlogs = await utils.retrieveBlogs()
 
       const modifiedBlog = {
-        userId: blogUser._id,
         title: 'This has been modified',
         author: 'Teppo Testaajan Poika',
         url: 'https://www.youtube.com/watch?v=oavMtUWDBTM',
         likes: 42
       }
 
-      await api.put(`/api/blogs/${addedBlog._id}`)
+      await api
+        .put(`/api/blogs/${addedBlog._id}`)
+        .set(authHeaders)
         .send(modifiedBlog)
         .expect(200)
 
@@ -237,14 +210,16 @@ describe('when some blogs already exist', async () => {
       const beforeBlogs = await utils.retrieveBlogs()
 
       const modifiedBlog = {
-        userId: blogUser._id,
         title: 'This has been modified',
         author: 'Teppo Testaajan Poika',
         url: 'https://www.youtube.com/watch?v=oavMtUWDBTM',
         likes: 42
       }
 
-      await api.put('/api/blogs/inexistent').send(modifiedBlog)
+      await api
+        .put('/api/blogs/inexistent')
+        .set(authHeaders)
+        .send(modifiedBlog)
         .expect(500)
 
       const afterBlogs = await utils.retrieveBlogs()
@@ -259,7 +234,9 @@ describe('when some blogs already exist', async () => {
     test('missing fields', async () => {
       const beforeBlogs = await utils.retrieveBlogs()
 
-      await api.put(`/api/blogs/${addedBlog._id}`)
+      await api
+        .put(`/api/blogs/${addedBlog._id}`)
+        .set(authHeaders)
         .send({})
         .expect(400)
 
