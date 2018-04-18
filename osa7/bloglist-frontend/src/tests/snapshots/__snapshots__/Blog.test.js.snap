@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Blog /> renders correctly 1`] = `
+<div
+  className="blog"
+>
+  <div
+    className="title"
+  >
+    <a
+      href="/blogs/undefined"
+      onClick={[Function]}
+    >
+      Simple blog title
+      , 
+      Teppo Testaaja
+    </a>
+  </div>
+</div>
+`;

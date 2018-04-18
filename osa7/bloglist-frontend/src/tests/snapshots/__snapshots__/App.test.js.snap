@@ -1,0 +1,132 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<ProvidedApp /> renders correctly 1`] = `
+<div>
+  <div>
+    <div
+      className="notificationContainer"
+    />
+    <h1>
+      blog app
+    </h1>
+    <div
+      className="menuBar"
+    >
+      <a
+        aria-current="true"
+        className="menuLink active"
+        href="/"
+        onClick={[Function]}
+        style={
+          Object {
+            "background": "lightblue",
+            "borderRadius": 5,
+            "borderWidth": 1,
+            "color": "white",
+            "padding": 15,
+          }
+        }
+      >
+        blogs
+      </a>
+        
+      <a
+        aria-current={false}
+        className="menuLink"
+        href="/users"
+        onClick={[Function]}
+        style={
+          Object {
+            "borderRadius": 5,
+            "borderWidth": 1,
+            "color": "deepskyblue",
+            "padding": 15,
+          }
+        }
+      >
+        users
+      </a>
+      <div
+        className="loginView"
+      >
+        <div>
+          <div
+            style={
+              Object {
+                "display": "",
+              }
+            }
+          >
+            <button
+              className="button expand"
+              onClick={[Function]}
+            >
+              Login
+            </button>
+          </div>
+          <div
+            style={
+              Object {
+                "display": "none",
+              }
+            }
+          >
+            <h1>
+              Login to application
+            </h1>
+            <table>
+              <tbody>
+                <tr
+                  className="inputrow username"
+                >
+                  <td>
+                    Username
+                    :
+                  </td>
+                  <td>
+                    <input
+                      className="input username"
+                      name="username"
+                      onChange={[Function]}
+                      value=""
+                    />
+                  </td>
+                </tr>
+                <tr
+                  className="inputrow password"
+                >
+                  <td>
+                    Password
+                    :
+                  </td>
+                  <td>
+                    <input
+                      className="input password"
+                      name="password"
+                      onChange={[Function]}
+                      value=""
+                    />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <button
+              className="button login"
+              onClick={[Function]}
+            >
+              Login
+            </button>
+            <button
+              className="button collapse"
+              onClick={[Function]}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <hr />
+  </div>
+</div>
+`;
